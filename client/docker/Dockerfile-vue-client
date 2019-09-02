@@ -1,0 +1,20 @@
+FROM node:alpine
+
+RUN mkdir /app
+
+WORKDIR /app
+
+ENV path="/app/node_modules/.bin:${path}"
+
+COPY ./client/app/package.json  .
+
+ENV PORT=8091
+
+#npm was causing issues on alpine version
+RUN yarn install
+
+RUN addgroup --gid 111 safe-pseudo-user && \
+    adduser -u 111 -S safe-pseudo-user -G safe-pseudo-user --disabled-password --no-create-home
+
+USER safe-pseudo-user
+

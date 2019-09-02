@@ -1,0 +1,64 @@
+version: '3.7'
+
+services:
+  node-server:
+    build:
+      context: .
+      dockerfile: server/docker/Dockerfilenode
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./server/app:/app
+      - '/app/node_modules'
+
+
+  vue-client:
+    build:
+      context: .
+      dockerfile: client/docker/Dockerfile-vue-client
+    container_name: vue_client
+    ports:
+      - "8091:8091"
+    volumes:
+      - './client/app:/app'
+      - '/app/node_modules'
+    command: sh -c "npm run serve"
+
+
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./mysql:/docker-entrypoint-initdb.d
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+       MYSQL_ROOT_PASSWORD: root
+       MYSQL_USER: root
+       MYSQL_DATABASE: app
+    container_name: mysql
+
+
+ 
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - database_data_gp:/var/lib/postgresql/data
+
+
+volumes:
+    db_data:
+    database_data_gp:
+
+
+

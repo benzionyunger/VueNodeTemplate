@@ -1,0 +1,29 @@
+FROM node:alpine
+
+# Create app directory
+RUN mkdir /app
+WORKDIR /app
+
+# add `/usr/src/app/node_modules/.bin` to $PATH
+ENV PATH /admin/node_modules/.bin:$PATH
+
+# Install app dependencies
+# A wildcard is used to ensure both package.json AND package-lock.json are copied
+# where available (npm@5+)
+# COPY package*.json ./
+COPY ./server/app/package.json/ /app/package.json
+
+RUN npm install
+# If you are building your code for production
+RUN npm install --only=production
+
+RUN addgroup --gid 111 safe-pseudo-user && \
+    adduser -u 111 -S safe-pseudo-user -G safe-pseudo-user --disabled-password --no-create-home
+USER safe-pseudo-user
+
+# Bundle app source
+# COPY . .
+# COPY /app/ /app
+
+EXPOSE 8080
+CMD [ "npm", "start" ]

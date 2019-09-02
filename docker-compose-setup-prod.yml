@@ -1,0 +1,33 @@
+version: '3.7'
+services:
+  proxy:
+    build: setup/prod/nginx
+    image: my/nginx
+    container_name: nginx
+    volumes:
+    - letsencrypt_certs:/etc/nginx/certs
+    - letsencrypt_www:/var/www/letsencrypt
+    ports:
+    - "80:80"
+    restart: always
+
+    depends_on:
+      - web
+
+  letsencrypt:
+    build: setup/prod/certbot
+    image: my/cerbot
+    container_name: letsencrypt
+    command: /bin/true
+    volumes:
+    - letsencrypt_certs:/etc/letsencrypt
+    - letsencrypt_www:/var/www/letsencrypt
+
+  web:
+    image: dockercloud/hello-world
+    container_name: web
+    restart: always
+
+volumes:
+    letsencrypt_certs:
+    letsencrypt_www:

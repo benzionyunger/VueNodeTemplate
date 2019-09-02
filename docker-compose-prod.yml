@@ -1,0 +1,71 @@
+version: '3.7'
+
+services:
+  node-server:
+    build:
+      context: .
+      dockerfile: server/docker/Dockerfile-node-prod
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./server/app:/app
+      - '/app/node_modules'
+
+
+  vue-nginx-prod:
+    build:
+      context: .
+      dockerfile: client/docker/Dockerfile-vue-prod
+    container_name: vue_nginx-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - letsencrypt_certs:/etc/nginx/certs
+      - letsencrypt_www:/var/www/letsencrypt
+
+    environment:
+      - NODE_ENV=production
+      - PORT=80
+      - GENERATE_SOURCEMAP=false
+    restart: "no"
+    depends_on:
+      - node-server
+  
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./mysql:/docker-entrypoint-initdb.d
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+       MYSQL_ROOT_PASSWORD: root
+       MYSQL_USER: root
+       MYSQL_DATABASE: app
+    container_name: mysql_container
+
+
+ 
+  postgres:
+    image: postgres:latest
+    container_name: postgres-container
+    restart: always
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - database_data_gp:/var/lib/postgresql/data
+
+
+volumes:
+    db_data:
+    database_data_gp:
+    letsencrypt_certs:
+    letsencrypt_www:

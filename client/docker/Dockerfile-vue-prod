@@ -1,0 +1,25 @@
+FROM node:alpine as builder
+
+RUN mkdir /app
+WORKDIR /app
+
+ENV path="/app/node_modules/.bin:${path}"
+
+COPY ./client/app/package.json  . 
+
+#npm was causing issues on alpine version
+RUN yarn install
+
+COPY ./client/app/ .
+
+RUN npm run build
+ 
+
+#production container
+FROM nginx:1.15.9-alpine
+
+COPY --from=builder /app/dist/ /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
