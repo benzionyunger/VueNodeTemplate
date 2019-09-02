@@ -1,4 +1,4 @@
-># vue-docker-project
+># vue/nodejs docker project
 ## Introduction
 ___
 
@@ -19,7 +19,7 @@ Assuming docker is installed on your local machine, run the following command in
 
 `docker-compose -f docker-compose-dev.yml up -d`
 
-If docker launched successfully, your vue server can be found at [http://localhost:8181](), NodeJS server at [http://localhost:8090](), mysql server at [http://localhost:3306](), and postgress server at [http://localhost:5432]().
+If docker launched successfully, your vue server can be found at [http://localhost:8091](), NodeJS server at [http://localhost:8080](), mysql server at [http://localhost:3306](), and postgress server at [http://localhost:5432]().
 
 **Please note, like in all docker projects, all internal api calls, i.e, server to server, must be referenced by their docker service name followed by their port number, for example http://server-node:8080. The service names are the names under 'services' in the docker-compose-dev.yml file.
 This is unlike browser calls to the front-end server which will to the localhost, not the service.
@@ -33,11 +33,14 @@ ___
 - Run `docker-compose -f docker-compose-prod.yml up -d`
 - Check your app is running at your [localhost](http://localhost), which is default port 80.
  
-## How to launch a docker production environment -on a _remote server_.
+## How to launch a docker production environment on a _remote server_.
 ___
    To enable HTTPS on your website, you need certification from a CA (certification authority). [Letsencrypt](https://letsencrypt.org/) is a free certification authority service that provides certs that are valid for 90 days. To generate the certs follow the instructions:
-- Run the `generate_domain.py` file in the project's root directory, and enter the domain name.
-This will replace "{your_domain}" in all the configuration files withthe correct domain.
+- Run the `generate_domain.py` file in the project's root directory with your remote machine's domain name by executing:
+ 
+    `python3 generate_dmain.py -d {your_domain}`
+
+    This will replace "{your_domain}" in all the configuration files with the correct domain.
 -  In order to generate the certs, run the following command in your production server from the project root: 
     
     `python3 setup/prod/setup.py`
